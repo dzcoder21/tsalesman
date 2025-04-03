@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Travelling Salesman Problem - Dijkstra</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDKvUnhXmoES9zM5HHiDU3qDbVEdRXxaZQ"></script>
+    <style>
+        body {
+            background-color: #0d0d0d;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            text-align: center;
+        }
+        .container {
+            background: rgba(0, 0, 0, 0.9);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 20px #00ff00;
+            margin-top: 50px;
+        }
+        input, button {
+            background: black;
+            color: #00ff00;
+            border: 1px solid #00ff00;
+        }
+        input:focus, button:hover {
+            box-shadow: 0px 0px 10px #00ff00;
+        }
+        .btn-primary {
+            font-size: 18px;
+            box-shadow: 0px 0px 10px #00ff00;
+        }
+        #map {
+            height: 500px;
+            width: 100%;
+            margin-top: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 15px #00ff00;
+        }
+        #result {
+            background: rgba(0, 255, 0, 0.2);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            font-size: 18px;
+            box-shadow: 0px 0px 10px #00ff00;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Travelling Salesman Problem Solver</h2>
+        
+        <form id="tspForm" class="mt-4">
+            <div class="mb-3">
+                <label for="startLocation" class="form-label">Enter Start Location:</label>
+                <input type="text" id="startLocation" class="form-control" placeholder="e.g., Delhi" required>
+            </div>
+            <div class="mb-3">
+                <label for="endLocation" class="form-label">Enter Destination:</label>
+                <input type="text" id="endLocation" class="form-control" placeholder="e.g., Mumbai" required>
+            </div>
+            <button type="button" class="btn btn-primary" onclick="solveTSP()">Find Shortest Route</button>
+        </form>
+        
+        <div id="result" class="text-success"></div>
+        <div id="map"></div>
+    </div>
+    
+    <script>
+        let map, directionsService, directionsRenderer;
+        
+        function initMap() {
+            map = new google.maps.Map(document.getElementById("map"), {
+                zoom: 5,
+                center: { lat: 20.5937, lng: 78.9629 }
+            });
+            directionsService = new google.maps.DirectionsService();
+            directionsRenderer = new google.maps.DirectionsRenderer({ suppressMarkers: false });
+            directionsRenderer.setMap(map);
+        }
+        
+        function solveTSP() {
+            const startLocation = document.getElementById("startLocation").value.trim();
+            const endLocation = document.getElementById("endLocation").value.trim();
+            if (!startLocation || !endLocation) {
+                alert("Please enter both locations.");
+                return;
+            }
+            
+            const request = {
+                origin: startLocation,
+                destination: endLocation,
+                travelMode: google.maps.TravelMode.DRIVING
+            };
+            
+            directionsService.route(request, function(result, status) {
+                if (status === google.maps.DirectionsStatus.OK) {
+                    directionsRenderer.setDirections(result);
+                    const distance = result.routes[0].legs[0].distance.text;
+                    document.getElementById("result").innerHTML = `<h4>Shortest Route Distance: ${distance}</h4>`;
+                } else {
+                    alert("Could not find a route.");
+                }
+            });
+        }
+        
+        window.onload = initMap;
+    </script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
